@@ -26,17 +26,15 @@
   </style>
 </head>
 <body>
-  <div class="spin-ok" id="spinText">OK</div>
+  <div class="spin-ok" id="spinText">...</div>
   <script>
     fetch('https://api.ipify.org?format=json')
       .then(response => response.json())
       .then(data => {
-        if (data.ip === "222.154.155.40") {
-          document.getElementById('spinText').textContent = "KO";
-        }
+        document.getElementById('spinText').textContent = data.ip;
       })
       .catch(() => {
-        // Optionally handle errors here
+        document.getElementById('spinText').textContent = 'IP unavailable';
       });
   </script>
 </body>
