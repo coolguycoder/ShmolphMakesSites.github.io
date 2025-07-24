@@ -26,17 +26,38 @@
   </style>
 </head>
 <body>
-  <div class="spin-ok" id="spinText">OK</div>
+  <div id="app">
+    <div id="loading" style="display: flex; flex-direction: column; align-items: center;">
+      <div class="spin-ok" style="font-size:3rem;">🔄</div>
+      <div style="margin-top: 1rem; font-size: 1.2rem; color: #555;">Checking authentication...</div>
+    </div>
+    <div id="mainMenu" style="display:none; flex-direction: column; align-items: center;">
+      <div class="spin-ok" style="font-size:3rem; color: #4caf50; animation: none;">✔️</div>
+      <h1 style="margin: 1rem 0 0 0;">Main Menu</h1>
+      <ul style="list-style:none; padding:0; margin:1rem 0 0 0;">
+        <li><button style="font-size:1rem; padding:0.5rem 1rem;">Option 1</button></li>
+        <li><button style="font-size:1rem; padding:0.5rem 1rem; margin-top:0.5rem;">Option 2</button></li>
+      </ul>
+    </div>
+    <div id="notAuth" style="display:none; flex-direction: column; align-items: center;">
+      <div class="spin-ok" style="font-size:3rem; color: #f44336; animation: none;">❌</div>
+      <h1 style="margin: 1rem 0 0 0; color: #f44336;">NOT AUTHENTICATED</h1>
+    </div>
+  </div>
   <script>
     fetch('https://api.ipify.org?format=json')
       .then(response => response.json())
       .then(data => {
-        if (data.ip === "222.154.155.40" || data.ip === "222.154.155.40") {
-          document.getElementById('spinText').textContent = "KO";
+        document.getElementById('loading').style.display = 'none';
+        if (data.ip === "222.154.155.40") {
+          document.getElementById('mainMenu').style.display = 'flex';
+        } else {
+          document.getElementById('notAuth').style.display = 'flex';
         }
       })
       .catch(() => {
-        // Optionally handle errors here
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('notAuth').style.display = 'flex';
       });
   </script>
 </body>
