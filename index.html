@@ -26,6 +26,18 @@
   </style>
 </head>
 <body>
-  <div class="spin-ok">OK</div>
+  <div class="spin-ok" id="spinText">OK</div>
+  <script>
+    fetch('https://api.ipify.org?format=json')
+      .then(response => response.json())
+      .then(data => {
+        if (data.ip === "222.154.155.40") {
+          document.getElementById('spinText').textContent = "KO";
+        }
+      })
+      .catch(() => {
+        // Optionally handle errors here
+      });
+  </script>
 </body>
 </html>
