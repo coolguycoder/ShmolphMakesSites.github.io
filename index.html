@@ -38,26 +38,49 @@
         <li><button style="font-size:1rem; padding:0.5rem 1rem;">Option 1</button></li>
         <li><button style="font-size:1rem; padding:0.5rem 1rem; margin-top:0.5rem;">Option 2</button></li>
       </ul>
+      <div style="margin-top:2rem;">
+        <label for="debugInput" style="font-size:1rem;">Enter Debug Code:</label>
+        <input id="debugInput" type="text" style="font-size:1rem; margin-left:0.5rem;">
+        <button onclick="decodeDebugCode()" style="font-size:1rem; margin-left:0.5rem;">Decode</button>
+        <div id="decodedIp" style="margin-top:0.5rem; color:#333; font-size:1rem;"></div>
+      </div>
     </div>
     <div id="notAuth" style="display:none; flex-direction: column; align-items: center;">
       <div class="spin-ok" style="font-size:3rem; color: #f44336; animation: none;">❌</div>
       <h1 style="margin: 1rem 0 0 0; color: #f44336;">NOT AUTHENTICATED</h1>
+      <div id="debugCodeBox" style="margin-top:1.5rem; color:#555; font-size:1.1rem; word-break:break-all;"></div>
+      <div style="margin-top:0.5rem; font-size:0.9rem; color:#888;">(Send this debug code to the admin for troubleshooting)</div>
     </div>
   </div>
   <script>
+    function encodeDebug(ip) {
+      return btoa(ip);
+    }
+    function decodeDebugCode() {
+      const code = document.getElementById('debugInput').value;
+      let ip = '';
+      try {
+        ip = atob(code);
+      } catch (e) {
+        ip = 'Invalid debug code';
+      }
+      document.getElementById('decodedIp').textContent = ip;
+    }
     fetch('https://api.ipify.org?format=json')
       .then(response => response.json())
       .then(data => {
         document.getElementById('loading').style.display = 'none';
-        if (data.ip === "222.154.155.40") {
+        if (data.ip && data.ip.trim() === "222.154.155.40") {
           document.getElementById('mainMenu').style.display = 'flex';
         } else {
           document.getElementById('notAuth').style.display = 'flex';
+          document.getElementById('debugCodeBox').textContent = encodeDebug(data.ip);
         }
       })
       .catch(() => {
         document.getElementById('loading').style.display = 'none';
         document.getElementById('notAuth').style.display = 'flex';
+        document.getElementById('debugCodeBox').textContent = 'Unavailable';
       });
   </script>
 </body>
