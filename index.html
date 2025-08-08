@@ -27,13 +27,23 @@
 </head>
 <body>
   <div id="app">
-    <div id="loginForm" style="display: flex; flex-direction: column; align-items: center;">
-      <div class="spin-ok" style="font-size:3rem;">�</div>
+    <div id="loginForm" style="display: none; flex-direction: column; align-items: center;">
+      <div class="spin-ok" style="font-size:3rem;">🔒</div>
       <h2 style="margin: 1rem 0 0.5rem 0;">Login</h2>
-      <input id="username" type="text" placeholder="Username" style="font-size:1rem; margin:0.5rem 0; padding:0.5rem; width: 200px;">
-      <input id="password" type="password" placeholder="Password" style="font-size:1rem; margin:0.5rem 0; padding:0.5rem; width: 200px;">
+      <input id="loginUsername" type="text" placeholder="Username" style="font-size:1rem; margin:0.5rem 0; padding:0.5rem; width: 200px;">
+      <input id="loginPassword" type="password" placeholder="Password" style="font-size:1rem; margin:0.5rem 0; padding:0.5rem; width: 200px;">
       <button onclick="doLogin()" style="font-size:1rem; margin:0.5rem 0; padding:0.5rem 1rem;">Login</button>
       <div id="loginError" style="color:#f44336; margin-top:0.5rem; display:none;">Invalid credentials</div>
+      <div style="margin-top:1rem; font-size:0.95rem; color:#555;">Don't have an account? <a href="#" onclick="showSignup();return false;">Sign up</a></div>
+    </div>
+    <div id="signupForm" style="display: none; flex-direction: column; align-items: center;">
+      <div class="spin-ok" style="font-size:3rem;">📝</div>
+      <h2 style="margin: 1rem 0 0.5rem 0;">Sign Up</h2>
+      <input id="signupUsername" type="text" placeholder="Username" style="font-size:1rem; margin:0.5rem 0; padding:0.5rem; width: 200px;">
+      <input id="signupPassword" type="password" placeholder="Password" style="font-size:1rem; margin:0.5rem 0; padding:0.5rem; width: 200px;">
+      <button onclick="doSignup()" style="font-size:1rem; margin:0.5rem 0; padding:0.5rem 1rem;">Sign Up</button>
+      <div id="signupError" style="color:#f44336; margin-top:0.5rem; display:none;"></div>
+      <div style="margin-top:1rem; font-size:0.95rem; color:#555;">Already have an account? <a href="#" onclick="showLogin();return false;">Login</a></div>
     </div>
     <div id="mainMenu" style="display:none; flex-direction: column; align-items: center;">
       <div class="spin-ok" style="font-size:3rem; color: #4caf50; animation: none;">✔️</div>
@@ -71,22 +81,56 @@
       document.getElementById('decodedIp').textContent = result;
     }
 
-    // Set your valid username and password here
-    const VALID_USER = '123';
-    const VALID_PASS = '123';
-
+    function showLogin() {
+      document.getElementById('signupForm').style.display = 'none';
+      document.getElementById('loginForm').style.display = 'flex';
+      document.getElementById('loginError').style.display = 'none';
+    }
+    function showSignup() {
+      document.getElementById('loginForm').style.display = 'none';
+      document.getElementById('signupForm').style.display = 'flex';
+      document.getElementById('signupError').style.display = 'none';
+    }
     function doLogin() {
-      const user = document.getElementById('username').value;
-      const pass = document.getElementById('password').value;
-      if (user === VALID_USER && pass === VALID_PASS) {
-        document.getElementById('loginForm').style.display = 'none';
-        document.getElementById('mainMenu').style.display = 'flex';
+      const user = document.getElementById('loginUsername').value;
+      const pass = document.getElementById('loginPassword').value;
+      const stored = localStorage.getItem('userAuth');
+      if (stored) {
+        const { username, password } = JSON.parse(stored);
+        if (user === username && pass === password) {
+          document.getElementById('loginForm').style.display = 'none';
+          document.getElementById('mainMenu').style.display = 'flex';
+        } else {
+          document.getElementById('loginError').style.display = 'block';
+        }
       } else {
-        document.getElementById('loginForm').style.display = 'none';
-        document.getElementById('notAuth').style.display = 'flex';
-        document.getElementById('debugCodeBox').textContent = encodeDebug(user + ':' + pass);
+        document.getElementById('loginError').style.display = 'block';
       }
     }
+    function doSignup() {
+      const user = document.getElementById('signupUsername').value;
+      const pass = document.getElementById('signupPassword').value;
+      if (!user || !pass) {
+        document.getElementById('signupError').textContent = 'Username and password required';
+        document.getElementById('signupError').style.display = 'block';
+        return;
+      }
+      if (localStorage.getItem('userAuth')) {
+        document.getElementById('signupError').textContent = 'Account already exists. Please login.';
+        document.getElementById('signupError').style.display = 'block';
+        return;
+      }
+      localStorage.setItem('userAuth', JSON.stringify({ username: user, password: pass }));
+      showLogin();
+    }
+    // On page load, show signup if no user, else show login
+    window.onload = function() {
+      if (localStorage.getItem('userAuth')) {
+        showLogin();
+      } else {
+        showSignup();
+      }
+    };
   </script>
 </body>
 </html>
