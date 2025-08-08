@@ -27,9 +27,13 @@
 </head>
 <body>
   <div id="app">
-    <div id="loading" style="display: flex; flex-direction: column; align-items: center;">
-      <div class="spin-ok" style="font-size:3rem;">🔄</div>
-      <div style="margin-top: 1rem; font-size: 1.2rem; color: #555;">Checking authentication...</div>
+    <div id="loginForm" style="display: flex; flex-direction: column; align-items: center;">
+      <div class="spin-ok" style="font-size:3rem;">�</div>
+      <h2 style="margin: 1rem 0 0.5rem 0;">Login</h2>
+      <input id="username" type="text" placeholder="Username" style="font-size:1rem; margin:0.5rem 0; padding:0.5rem; width: 200px;">
+      <input id="password" type="password" placeholder="Password" style="font-size:1rem; margin:0.5rem 0; padding:0.5rem; width: 200px;">
+      <button onclick="doLogin()" style="font-size:1rem; margin:0.5rem 0; padding:0.5rem 1rem;">Login</button>
+      <div id="loginError" style="color:#f44336; margin-top:0.5rem; display:none;">Invalid credentials</div>
     </div>
     <div id="mainMenu" style="display:none; flex-direction: column; align-items: center;">
       <div class="spin-ok" style="font-size:3rem; color: #4caf50; animation: none;">✔️</div>
@@ -53,35 +57,36 @@
     </div>
   </div>
   <script>
-    function encodeDebug(ip) {
-      return btoa(ip);
+    function encodeDebug(str) {
+      return btoa(str);
     }
     function decodeDebugCode() {
       const code = document.getElementById('debugInput').value;
-      let ip = '';
+      let result = '';
       try {
-        ip = atob(code);
+        result = atob(code);
       } catch (e) {
-        ip = 'Invalid debug code';
+        result = 'Invalid debug code';
       }
-      document.getElementById('decodedIp').textContent = ip;
+      document.getElementById('decodedIp').textContent = result;
     }
-    fetch('https://api.ipify.org?format=json')
-      .then(response => response.json())
-      .then(data => {
-        document.getElementById('loading').style.display = 'none';
-        if (data.ip && data.ip.trim() === "222.153.17.194") {
-          document.getElementById('mainMenu').style.display = 'flex';
-        } else {
-          document.getElementById('notAuth').style.display = 'flex';
-          document.getElementById('debugCodeBox').textContent = encodeDebug(data.ip);
-        }
-      })
-      .catch(() => {
-        document.getElementById('loading').style.display = 'none';
+
+    // Set your valid username and password here
+    const VALID_USER = '123';
+    const VALID_PASS = '123';
+
+    function doLogin() {
+      const user = document.getElementById('username').value;
+      const pass = document.getElementById('password').value;
+      if (user === VALID_USER && pass === VALID_PASS) {
+        document.getElementById('loginForm').style.display = 'none';
+        document.getElementById('mainMenu').style.display = 'flex';
+      } else {
+        document.getElementById('loginForm').style.display = 'none';
         document.getElementById('notAuth').style.display = 'flex';
-        document.getElementById('debugCodeBox').textContent = 'Unavailable';
-      });
+        document.getElementById('debugCodeBox').textContent = encodeDebug(user + ':' + pass);
+      }
+    }
   </script>
 </body>
 </html>
