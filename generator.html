@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Download Main.zip</title>
+  <style>
+    body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; display:flex; align-items:center; justify-content:center; height:100vh; margin:0; background:#f5f7fb; color:#111; }
+    .card { background:#fff; padding:28px; border-radius:12px; box-shadow:0 6px 24px rgba(20,20,40,0.06); text-align:center; width:min(520px,90%); }
+    button { padding:10px 16px; border-radius:8px; border:1px solid #ccc; background:#fff; cursor:pointer; font-size:15px; }
+    p { margin:14px 0 10px; }
+    small { color:#666; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>Preparing your download…</h2>
+    <p id="status">Attempting to download <strong>Main.zip</strong>.</p>
+    <button id="manual">If nothing happened, click to download</button>
+    <p><small>Make sure <strong>Main.zip</strong> is in the same folder as this HTML file.</small></p>
+  </div>
+
+  <script>
+    // filename to download
+    const FILENAME = 'Main.zip';
+
+    // try to fetch and trigger download via blob (more reliable)
+    async function downloadFile(name) {
+      try {
+        const res = await fetch(name);
+        if (!res.ok) throw new Error('Fetch failed: ' + res.status);
+        const blob = await res.blob();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = name;
+        // append -> click -> cleanup
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(() => {
+          URL.revokeObjectURL(url);
+          a.remove();
+        }, 1000);
+        return true;
+      } catch (err) {
+        console.warn('Blob download failed, falling back to direct link', err);
+        // fallback: create direct link to file (may trigger navigation or save)
+        try {
+          const a = document.createElement('a');
+          a.href = name;
+          a.download = name;
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          return true;
+        } catch (e) {
+          console.error('Fallback link also failed', e);
+          return false;
+        }
+      }
+    }
+
+    // run on load, and update UI
+    window.addEventListener('DOMContentLoaded', async () => {
+      const status = document.getElementById('status');
+      const manual = document.getElementById('manual');
+
+      const ok = await downloadFile(FILENAME);
+      if (ok) {
+        status.textContent = 'If your browser didn\'t block it, Main.zip should be downloading now.';
+      } else {
+        status.textContent = 'Automatic download failed. Click the button below to try manually.';
+      }
+
+      manual.addEventListener('click', () => {
+        downloadFile(FILENAME);
+      });
+    });
+  </script>
+</body>
+</html>
